@@ -1,0 +1,98 @@
+"use client";
+
+import * as React from "react";
+import { ArrowUp } from "lucide-react";
+
+import { Button } from "@/components/ui/Button";
+import { cn } from "@/utils/cn";
+
+export interface ChatInputProps
+  extends Omit<
+    React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+    "onSubmit"
+  > {
+  loading?: boolean;
+  onSubmit?: () => void;
+}
+
+const ChatInput = React.forwardRef<
+  HTMLTextAreaElement,
+  ChatInputProps
+>(
+  (
+    {
+      className,
+      loading = false,
+      onSubmit,
+      disabled,
+      ...props
+    },
+    ref,
+  ) => {
+    function handleKeyDown(
+      event: React.KeyboardEvent<HTMLTextAreaElement>,
+    ) {
+      if (
+        event.key === "Enter" &&
+        !event.shiftKey
+      ) {
+        event.preventDefault();
+        onSubmit?.();
+      }
+    }
+
+    return (
+      <div
+        className={cn(
+          [
+            "flex items-end gap-3",
+            "rounded-[var(--radius-xl)]",
+            "border border-[var(--border)]",
+            "bg-[var(--surface)]",
+            "p-3",
+          ],
+          className,
+        )}
+      >
+        <textarea
+          ref={ref}
+          rows={1}
+          disabled={disabled || loading}
+          onKeyDown={handleKeyDown}
+          className={cn(
+            [
+              "max-h-40",
+              "min-h-11",
+              "flex-1",
+              "resize-none",
+              "bg-transparent",
+              "px-2",
+              "py-2",
+              "text-sm",
+              "text-[var(--text-primary)]",
+              "placeholder:text-[var(--text-muted)]",
+              "outline-none",
+            ],
+          )}
+          {...props}
+        />
+
+        <Button
+          size="icon"
+          loading={loading}
+          onClick={onSubmit}
+          disabled={disabled}
+          aria-label="Send message"
+        >
+          {!loading && (
+            <ArrowUp className="h-4 w-4" />
+          )}
+        </Button>
+      </div>
+    );
+  },
+);
+
+ChatInput.displayName = "ChatInput";
+
+export { ChatInput };

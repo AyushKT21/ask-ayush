@@ -34,86 +34,128 @@ export type ContactLink = {
 
 export const PROFILE = {
   name: "Ayush",
-  fullName: "Ayush Kumar",
+  fullName: "Ayush Tiwari",
   title: "Frontend Developer",
+  tagline: "React · TypeScript · UI Systems",
   location: "India",
   summary:
-    "I build modern, performant web experiences with React and Next.js. I care about clean architecture, thoughtful UX, and shipping products that feel polished — like this AI-first portfolio.",
-  highlights: [
-    "2+ years building production React and Next.js apps",
-    "Strong TypeScript, component design, and design systems",
-    "Experience integrating AI into real user-facing products",
+    "I'm a frontend developer who focuses on building polished, practical interfaces that feel fast, clear, and easy to use. I like turning complex product ideas into reusable components, clean layouts, and predictable user flows.",
+  bio: [
+    "Most of my recent work has been around React, TypeScript, responsive UI, and making interfaces feel production-ready.",
+    "I also built Ayush AI (this site) and Edge Folio — a single-page portfolio inspired by the Edge browser, where everything stays on one screen without endless scrolling.",
   ],
+  highlights: [
+    "2+ years building scalable web applications with React and TypeScript",
+    "Enterprise insurance platforms: journeys, config-driven UI, and API-heavy dashboards",
+    "Design-to-code workflows from Figma to reusable component systems",
+    "AI portfolio with OpenAI + Vercel AI SDK (streaming chat and live context panels)",
+  ],
+  classicPortfolioHref: "https://edge-folio.vercel.app/",
 } as const;
 
 export const PROJECTS: Project[] = [
   {
-    id: "devvault-ai",
-    title: "DevVault AI",
+    id: "insurance-journey-builder",
+    title: "Insurance Journey Builder",
     description:
-      "AI-powered developer workspace for snippets, documentation, and project knowledge.",
-    tags: ["Next.js", "TypeScript", "OpenAI", "Tailwind CSS"],
+      "A configurable React flow for dynamic forms, validations, and multi-step insurance journeys.",
+    tags: ["React", "TypeScript", "Forms", "Config-driven UI"],
     featured: true,
-    href: "#",
-    github: "#",
+    thumbnailSrc: "/projects/insurance-journey-builder.svg",
   },
   {
     id: "ayush-ai",
-    title: "Ayush AI",
+    title: "Ayush AI Portfolio",
     description:
-      "An AI-first portfolio where visitors chat to explore my career, skills, and projects.",
-    tags: ["React 19", "Next.js 16", "Vercel AI SDK", "Tailwind v4"],
+      "Interactive AI portfolio — explore my work through conversation, streaming answers, and guided navigation.",
+    tags: ["Next.js", "OpenAI", "Vercel AI SDK", "React 19"],
     featured: true,
-    href: "#",
-    github: "#",
+    href: "https://ask-ayush.vercel.app/",
+    github: "https://github.com/AyushKT21/ask-ayush",
+    thumbnailSrc: "/projects/ayush-ai.svg",
   },
   {
-    id: "ecommerce-store",
-    title: "E-Commerce Store",
+    id: "edge-folio",
+    title: "Edge Folio (Ayush.dev)",
     description:
-      "Full-stack storefront with cart, checkout flow, and admin-friendly product management.",
-    tags: ["Next.js", "Node.js", "PostgreSQL", "Stripe"],
+      "Single-page portfolio inspired by Microsoft Edge — glass cards, no long scroll; skills, projects, and experience in one view.",
+    tags: ["React", "Vite", "CSS", "UI Design"],
     featured: true,
-    href: "#",
-    github: "#",
+    href: "https://edge-folio.vercel.app/",
+    github: "https://github.com/AyushKT21",
+    thumbnailSrc: "/projects/edge-folio.svg",
+  },
+  {
+    id: "design-to-code-ui",
+    title: "Design-to-Code UI System",
+    description:
+      "A reusable component system built from Figma designs with responsive behavior and clean interaction states.",
+    tags: ["React", "CSS", "Figma", "Components"],
+    featured: true,
+    thumbnailSrc: "/projects/design-to-code-ui.svg",
+  },
+  {
+    id: "performance-dashboard",
+    title: "Performance-First Dashboard",
+    description:
+      "Enterprise dashboard work focused on API rendering, caching, and keeping interactions responsive at scale.",
+    tags: ["React", "REST APIs", "React Query", "Performance"],
+    featured: false,
+    thumbnailSrc: "/projects/performance-dashboard.svg",
   },
 ];
 
 export const EXPERIENCE: ExperienceEntry[] = [
   {
-    id: "frizz-frontend",
-    role: "Frontend Developer",
-    company: "Frizz Solutions",
-    period: "2023 — Present",
+    id: "nvest",
+    role: "Software Engineer",
+    company: "Nvest",
+    period: "2024 — Present",
     description:
-      "Ship responsive dashboards and marketing sites, own component libraries, and collaborate on API integration with backend teams.",
+      "Developed and maintained enterprise-scale insurance platforms using React and TypeScript. Built dynamic insurance journeys with configurable forms, validations, and conditional workflows. Architected reusable component systems and config-driven UI modules across products. Integrated REST APIs with caching, optimistic updates, and dynamic data mapping. Optimized rendering with memoization, lazy loading, and code-splitting. Supported scalable frontend architecture for Motor, Health, and Reinsurance flows.",
     current: true,
   },
   {
-    id: "web-intern",
-    role: "Web Developer Intern",
-    company: "Startup Studio",
-    period: "2022 — 2023",
+    id: "techloom",
+    role: "Frontend Developer",
+    company: "Techloom",
+    period: "2022 — 2024",
     description:
-      "Built landing pages and internal tools with React, improved Core Web Vitals, and learned agile delivery in a small team.",
+      "Developed client-facing web applications with React, JavaScript, HTML, and CSS. Built modular UI components with a component-driven architecture. Integrated backend APIs and dynamic data rendering. Created responsive layouts for desktop, tablet, and mobile. Collaborated with designers to translate Figma designs into production-ready interfaces.",
   },
 ];
 
 export const SKILL_CATEGORIES: SkillCategory[] = [
   {
     id: "frontend",
-    label: "Frontend",
-    skills: ["React", "Next.js", "TypeScript", "Tailwind CSS", "HTML & CSS"],
+    label: "Frontend Engineering",
+    skills: [
+      "React",
+      "TypeScript",
+      "JavaScript",
+      "HTML",
+      "CSS",
+      "Next.js",
+      "Tailwind CSS",
+    ],
   },
   {
-    id: "backend",
-    label: "Backend & APIs",
-    skills: ["Node.js", "REST APIs", "PostgreSQL", "Prisma"],
+    id: "architecture",
+    label: "Architecture & Systems",
+    skills: [
+      "Component Architecture",
+      "Config-Driven UI",
+      "Reusable Systems",
+      "REST APIs",
+      "API Integration",
+      "Performance Optimization",
+      "Dynamic Form Workflows",
+    ],
   },
   {
     id: "tools",
-    label: "Tools & DevOps",
-    skills: ["Git", "Docker", "Vercel", "Figma", "Postman"],
+    label: "Developer Tools",
+    skills: ["Git", "React Query", "Figma", "Vercel", "Docker"],
   },
   {
     id: "ai",
@@ -126,46 +168,40 @@ export const TECH_STACK = [
   "React",
   "Next.js",
   "TypeScript",
-  "Node.js",
   "Tailwind CSS",
-  "PostgreSQL",
+  "Node.js",
+  "React Query",
   "Git",
-  "Docker",
+  "Figma",
 ] as const;
 
 export const CONTACT_LINKS: ContactLink[] = [
   {
     id: "github",
     label: "GitHub",
-    href: "https://github.com",
+    href: "https://github.com/AyushKT21",
     kind: "github",
   },
   {
     id: "linkedin",
     label: "LinkedIn",
-    href: "https://linkedin.com",
+    href: "https://www.linkedin.com/in/ayusht21/",
     kind: "linkedin",
   },
   {
     id: "email",
     label: "Email",
-    href: "mailto:hello@example.com",
+    href: "mailto:ayushtiwari20072001@gmail.com",
     kind: "email",
-  },
-  {
-    id: "twitter",
-    label: "Twitter",
-    href: "https://twitter.com",
-    kind: "twitter",
   },
 ];
 
 export const RESUME = {
-  fileName: "Ayush-Kumar-Resume.pdf",
-  downloadHref: "#",
+  fileName: "Ayush_Tiwari_resume.pdf",
+  downloadHref: "/Ayush_Tiwari_resume.pdf",
   lastUpdated: "2026",
   headline:
-    "Frontend developer focused on React, Next.js, and AI-powered product experiences.",
+    "Frontend developer focused on React, TypeScript, UI systems, and AI-powered product experiences.",
 } as const;
 
 export const FEATURED_PROJECTS = PROJECTS.filter(

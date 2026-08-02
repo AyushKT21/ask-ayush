@@ -68,7 +68,7 @@ const navigation: NavigationItem[] = [
   },
   {
     label: "GitHub",
-    href: "https://github.com",
+    href: "https://github.com/AyushKT21",
     icon: FolderGit2,
   },
   {

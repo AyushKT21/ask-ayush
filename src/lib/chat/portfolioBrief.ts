@@ -26,6 +26,8 @@ export function getPortfolioBrief(): string {
     `Title: ${PROFILE.title}`,
     `Location: ${PROFILE.location}`,
     `Summary: ${PROFILE.summary}`,
+    `Bio: ${PROFILE.bio.join(" ")}`,
+    `Classic portfolio: ${PROFILE.classicPortfolioHref}`,
     `Highlights: ${PROFILE.highlights.join("; ")}`,
     `Projects:\n${projects}`,
     `Experience:\n${experience}`,

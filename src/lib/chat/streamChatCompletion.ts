@@ -90,7 +90,15 @@ async function streamOpenAiCompletion(
     }
   }
 
-  let finalMessage = (await result.text).trim() || message.trim();
+  let finalMessage = message.trim();
+
+  if (!finalMessage) {
+    try {
+      finalMessage = (await result.text).trim();
+    } catch {
+      finalMessage = "";
+    }
+  }
 
   if (!finalMessage) {
     const mock = runDevMockChat(messages);
@@ -101,6 +109,14 @@ async function streamOpenAiCompletion(
   if (!lastContext) {
     lastContext = runDevMockChat(messages).context;
   }
+
+  controller.enqueue(
+    encodeEvent({
+      type: "delta",
+      message: finalMessage,
+      context: lastContext,
+    }),
+  );
 
   controller.enqueue(
     encodeEvent({

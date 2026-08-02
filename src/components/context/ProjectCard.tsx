@@ -2,8 +2,9 @@ import {
   BriefcaseBusiness,
   ExternalLink,
   FolderGit2,
-  ShoppingBag,
+  LayoutDashboard,
   Sparkles,
+  Workflow,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -16,9 +17,11 @@ import { cn } from "@/utils/cn";
 import { ProjectThumbnail } from "./ProjectThumbnail";
 
 const iconByProject: Record<string, typeof Sparkles> = {
-  "devvault-ai": Sparkles,
+  "insurance-journey-builder": Workflow,
   "ayush-ai": Sparkles,
-  "ecommerce-store": ShoppingBag,
+  "edge-folio": LayoutDashboard,
+  "design-to-code-ui": LayoutDashboard,
+  "performance-dashboard": LayoutDashboard,
 };
 
 type ProjectCardProps = {
@@ -37,6 +40,14 @@ export function ProjectCard({ project, compact = false }: ProjectCardProps) {
         "hover:border-[var(--primary)]/35 hover:shadow-md",
       )}
     >
+      <ProjectThumbnail
+        project={project}
+        className={cn(
+          "h-36 w-full rounded-none border-0 border-b border-[var(--border)]",
+          compact && "h-28",
+        )}
+      />
+
       <div className="p-4">
         <div className="flex items-start gap-3">
           <div
@@ -68,22 +79,7 @@ export function ProjectCard({ project, compact = false }: ProjectCardProps) {
               ))}
             </div>
           </div>
-
-          <ProjectThumbnail
-            project={project}
-            className={cn(
-              "h-14 w-[4.5rem] shrink-0",
-              compact ? "hidden sm:block" : "block",
-            )}
-          />
         </div>
-
-        {compact && (
-          <ProjectThumbnail
-            project={project}
-            className="mt-3 h-20 w-full sm:hidden"
-          />
-        )}
       </div>
 
       {(project.href || project.github) && (

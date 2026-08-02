@@ -1,6 +1,7 @@
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardContent } from "@/components/ui/Card";
+import Link from "next/link";
 import { PROFILE } from "@/constants/portfolio";
 
 import { PanelHeading } from "./PanelHeading";
@@ -18,7 +19,7 @@ export function AboutPanel() {
             <div>
               <p className="text-lg font-semibold">{PROFILE.fullName}</p>
               <p className="text-sm text-[var(--text-muted)]">
-                {PROFILE.title} · {PROFILE.location}
+                {PROFILE.title} · {PROFILE.tagline} · {PROFILE.location}
               </p>
             </div>
           </div>
@@ -26,6 +27,24 @@ export function AboutPanel() {
           <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
             {PROFILE.summary}
           </p>
+
+          {PROFILE.bio.map((paragraph) => (
+            <p
+              key={paragraph}
+              className="text-sm leading-relaxed text-[var(--text-secondary)]"
+            >
+              {paragraph}
+            </p>
+          ))}
+
+          <Link
+            href={PROFILE.classicPortfolioHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-medium text-[var(--primary)] hover:underline"
+          >
+            View my classic portfolio (Edge Folio) →
+          </Link>
         </CardContent>
       </Card>
 

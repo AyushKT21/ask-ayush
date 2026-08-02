@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" fill="none">
+  <rect width="640" height="360" fill="#0c1222"/>
+  <rect x="40" y="40" width="260" height="120" rx="16" fill="#1e3a5f" fill-opacity="0.6" stroke="#38bdf8" stroke-opacity="0.4"/>
+  <rect x="320" y="40" width="280" height="120" rx="16" fill="#312e81" fill-opacity="0.5" stroke="#a78bfa" stroke-opacity="0.4"/>
+  <rect x="40" y="200" width="180" height="100" rx="14" fill="#134e4a" fill-opacity="0.45" stroke="#2dd4bf" stroke-opacity="0.35"/>
+  <rect x="240" y="200" width="180" height="100" rx="14" fill="#4c1d95" fill-opacity="0.45" stroke="#c084fc" stroke-opacity="0.35"/>
+  <rect x="440" y="200" width="160" height="100" rx="14" fill="#831843" fill-opacity="0.4" stroke="#f472b6" stroke-opacity="0.35"/>
+  <text x="56" y="78" fill="#e2e8f0" font-family="system-ui,sans-serif" font-size="13" font-weight="700">Ayush.dev</text>
+  <text x="56" y="98" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="10">Edge-inspired one-page portfolio</text>
+</svg>

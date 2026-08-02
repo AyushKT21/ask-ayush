@@ -65,7 +65,6 @@ function HomePageContent() {
   const [messages, setMessages] = React.useState<ChatMessage[]>([]);
   const [context, setContext] = React.useState<PortfolioContext>(contextFromUrl);
   const [draft, setDraft] = React.useState("");
-  const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [chatSource, setChatSource] = React.useState<"openai" | "mock" | null>(
     null,
@@ -131,7 +130,6 @@ function HomePageContent() {
     }
 
     if (!chatIdFromUrl) {
-      loadedChatIdRef.current = null;
       return;
     }
 
@@ -157,6 +155,14 @@ function HomePageContent() {
   }, [chatIdFromUrl, isNewChat, pathname, router]);
 
   const hasConversation = messages.length > 0;
+
+  const streamingAssistantMessage = streamingAssistantId
+    ? messages.find((message) => message.id === streamingAssistantId)
+    : null;
+
+  const isAwaitingAssistantText =
+    streamingAssistantId !== null &&
+    !streamingAssistantMessage?.content.trim();
 
   const syncContextInUrl = React.useCallback(
     (nextContext: PortfolioContext) => {
@@ -199,10 +205,12 @@ function HomePageContent() {
     [refreshRecentChats],
   );
 
+  const sendInFlightRef = React.useRef(false);
+
   const sendMessage = React.useCallback(
     async (text: string) => {
       const trimmed = text.trim();
-      if (!trimmed || loading) return;
+      if (!trimmed || sendInFlightRef.current) return;
 
       const sessionId = activeChatId ?? crypto.randomUUID();
       if (!activeChatId) {
@@ -219,9 +227,9 @@ function HomePageContent() {
 
       setMessages(nextMessages);
       setDraft("");
-      setLoading(true);
       setError(null);
       setStreamingAssistantId(assistantId);
+      sendInFlightRef.current = true;
       loadedChatIdRef.current = sessionId;
 
       const inferredContext = inferPortfolioContextFromMessages(
@@ -236,7 +244,6 @@ function HomePageContent() {
           toApiMessages(nextMessages.filter((message) => message.content)),
           (event) => {
             if (event.type === "delta") {
-              setLoading(false);
               setMessages((previous) =>
                 previous.map((message) =>
                   message.id === assistantId
@@ -253,6 +260,18 @@ function HomePageContent() {
               if (event.context) {
                 setContext(event.context);
               }
+            }
+
+            if (event.type === "finish") {
+              setMessages((previous) =>
+                previous.map((message) =>
+                  message.id === assistantId
+                    ? { ...message, content: event.message }
+                    : message,
+                ),
+              );
+              setContext(event.context);
+              setStreamingAssistantId(null);
             }
           },
         );
@@ -285,13 +304,12 @@ function HomePageContent() {
             : "Something went wrong",
         );
       } finally {
+        sendInFlightRef.current = false;
         setStreamingAssistantId(null);
-        setLoading(false);
       }
     },
     [
       activeChatId,
-      loading,
       messages,
       persistSession,
       router,
@@ -378,10 +396,7 @@ function HomePageContent() {
         <Hero onSendMessage={sendMessage} disclaimer={getDisclaimer()} />
       ) : (
         <div className="flex h-full min-h-0 flex-col">
-          <ChatWindow
-            className="min-h-0 flex-1 px-4 py-4 sm:px-6 sm:py-6"
-            loading={loading && !streamingAssistantId}
-          >
+          <ChatWindow className="min-h-0 flex-1 px-4 py-4 sm:px-6 sm:py-6">
             {messages
               .filter(
                 (message) =>
@@ -419,7 +434,7 @@ function HomePageContent() {
             <ChatInput
               value={draft}
               placeholder="Ask me anything about my career, skills, or projects..."
-              loading={loading}
+              loading={isAwaitingAssistantText}
               onChange={(event) => setDraft(event.target.value)}
               onSubmit={handleChatSubmit}
             />

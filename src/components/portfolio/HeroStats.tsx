@@ -16,7 +16,7 @@ type HeroStat = {
 
 const stats: HeroStat[] = [
   {
-    value: "1.8+",
+    value: "2+",
     label: "Years Experience",
     icon: <BriefcaseBusiness className="h-4 w-4" />,
   },

@@ -199,7 +199,7 @@ export const CONTACT_LINKS: ContactLink[] = [
 export const RESUME = {
   fileName: "Ayush_Tiwari_resume.pdf",
   downloadHref: "/Ayush_Tiwari_resume.pdf",
-  lastUpdated: "2026",
+  lastUpdated: "Mar 2026",
   headline:
     "Frontend developer focused on React, TypeScript, UI systems, and AI-powered product experiences.",
 } as const;

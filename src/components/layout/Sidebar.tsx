@@ -15,6 +15,7 @@ import Link from "next/link";
 
 import type { ContextType } from "@/components/context/ContextPanel";
 import { buttonVariants } from "@/components/ui/Button";
+import { PROFILE } from "@/constants/portfolio";
 import { cn } from "@/utils/cn";
 
 type NavigationItem = {
@@ -65,6 +66,11 @@ const navigation: NavigationItem[] = [
     href: "/?context=resume",
     icon: FileText,
     context: "resume",
+  },
+  {
+    label: "Ayush.dev",
+    href: PROFILE.classicPortfolioHref,
+    icon: FolderGit2,
   },
   {
     label: "GitHub",

@@ -17,6 +17,7 @@ import { ChatInput } from "@/components/chat/ChatInput";
 import { SuggestionChip } from "@/components/chat/SuggestionChip";
 
 import { HeroStats } from "./HeroStats";
+import { ClassicPortfolioLink } from "./ClassicPortfolioLink";
 
 const primarySuggestions = [
   {
@@ -89,6 +90,8 @@ export function Hero({ onSendMessage, disclaimer }: HeroProps) {
           I built this AI to answer anything about my career, projects,
           experience, and skills.
         </p>
+
+        <ClassicPortfolioLink className="mt-4" />
 
         <div className="mt-10 w-full max-w-3xl">
           <ChatInput

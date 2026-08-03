@@ -14,6 +14,7 @@ import {
   type ContextType,
 } from "@/components/context/ContextPanel";
 import { Hero } from "@/components/portfolio/Hero";
+import { ClassicPortfolioLink } from "@/components/portfolio/ClassicPortfolioLink";
 import { Spinner } from "@/components/ui/Spinner";
 import { ThinkingIndicator } from "@/components/chat/ThinkingIndicator";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
@@ -391,15 +392,17 @@ function HomePageContent() {
   }
 
   function getDisclaimer() {
+    const signature = "Made with care by Ayush Tiwari.";
+
     if (chatSource === "openai") {
-      return "Powered by OpenAI via Vercel AI SDK. Verify important details.";
+      return `${signature} AI-assisted answers — please verify important details.`;
     }
 
     if (chatSource === "mock") {
-      return "Using local portfolio templates. Add OPENAI_API_KEY to .env.local and restart npm run dev for OpenAI.";
+      return `${signature} Demo mode (local templates). Add OPENAI_API_KEY for live AI.`;
     }
 
-    return "Ayush AI can make mistakes. Consider verifying important information.";
+    return `${signature} AI can make mistakes — verify important information.`;
   }
 
   function handleDeleteChatRequest(chatId: string) {
@@ -537,6 +540,10 @@ function HomePageContent() {
             <p className="mt-3 text-center text-xs text-[var(--text-muted)]">
               {getDisclaimer()}
             </p>
+
+            <div className="mt-2 flex justify-center">
+              <ClassicPortfolioLink className="text-xs" />
+            </div>
           </div>
         </div>
       )}

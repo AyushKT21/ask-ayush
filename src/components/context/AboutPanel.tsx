@@ -14,7 +14,7 @@ export function AboutPanel() {
       <Card className="shadow-sm">
         <CardContent className="space-y-4 pt-6">
           <div className="flex items-center gap-3">
-            <Avatar fallback="AY" className="h-12 w-12 text-sm" />
+            <Avatar fallback="AT" className="h-12 w-12 text-sm" />
 
             <div>
               <p className="text-lg font-semibold">{PROFILE.fullName}</p>

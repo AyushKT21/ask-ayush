@@ -18,6 +18,10 @@ export const metadata: Metadata = {
   title: "Ayush AI",
   description:
     "Ask anything about my career, projects, experience and skills.",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: "/icon.svg",
+  },
 };
 
 export default function RootLayout({

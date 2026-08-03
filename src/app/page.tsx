@@ -7,6 +7,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { ChatWindow } from "@/components/chat/ChatWindow";
+import { FollowUpSuggestions } from "@/components/chat/FollowUpSuggestions";
 import { MessageBubble } from "@/components/chat/MessageBubble";
 import {
   ContextPanel,
@@ -14,6 +15,7 @@ import {
 } from "@/components/context/ContextPanel";
 import { Hero } from "@/components/portfolio/Hero";
 import { Spinner } from "@/components/ui/Spinner";
+import { ThinkingIndicator } from "@/components/chat/ThinkingIndicator";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import {
   createChatTitle,
@@ -24,9 +26,12 @@ import {
   type RecentChatSession,
 } from "@/lib/chat/recentChats";
 import { inferPortfolioContextFromMessages } from "@/lib/chat/inferPortfolioContext";
+import { getFollowUpSuggestions } from "@/lib/chat/followUpSuggestions";
 import { streamChatMessage } from "@/services/chat/streamChatMessage";
+import { useChatScroll } from "@/hooks/useChatScroll";
 import { PORTFOLIO_CONTEXTS, type PortfolioContext } from "@/types/context";
 import type { ChatMessage } from "@/types/chat";
+import { cn } from "@/utils/cn";
 
 function parseContext(value: string | null): PortfolioContext {
   if (value && PORTFOLIO_CONTEXTS.includes(value as PortfolioContext)) {
@@ -74,10 +79,13 @@ function HomePageContent() {
   const [streamingAssistantId, setStreamingAssistantId] = React.useState<
     string | null
   >(null);
+  const [isGenerating, setIsGenerating] = React.useState(false);
   const [pendingDeleteChatId, setPendingDeleteChatId] = React.useState<
     string | null
   >(null);
   const loadedChatIdRef = React.useRef<string | null>(null);
+  const sendInFlightRef = React.useRef(false);
+  const abortControllerRef = React.useRef<AbortController | null>(null);
 
   const refreshRecentChats = React.useCallback(() => {
     setRecentChats(listRecentChats());
@@ -156,13 +164,22 @@ function HomePageContent() {
 
   const hasConversation = messages.length > 0;
 
-  const streamingAssistantMessage = streamingAssistantId
-    ? messages.find((message) => message.id === streamingAssistantId)
-    : null;
+  const { endRef } = useChatScroll([
+    messages,
+    streamingAssistantId,
+    isGenerating,
+  ]);
 
-  const isAwaitingAssistantText =
-    streamingAssistantId !== null &&
-    !streamingAssistantMessage?.content.trim();
+  const lastAssistantMessage = [...messages]
+    .reverse()
+    .find((message) => message.role === "assistant");
+
+  const showFollowUps =
+    !isGenerating &&
+    lastAssistantMessage &&
+    lastAssistantMessage.content.trim().length > 0;
+
+  const followUpSuggestions = getFollowUpSuggestions(context);
 
   const syncContextInUrl = React.useCallback(
     (nextContext: PortfolioContext) => {
@@ -205,10 +222,12 @@ function HomePageContent() {
     [refreshRecentChats],
   );
 
-  const sendInFlightRef = React.useRef(false);
+  function handleStopGeneration() {
+    abortControllerRef.current?.abort();
+  }
 
   const sendMessage = React.useCallback(
-    async (text: string) => {
+    async (text: string, options?: { replaceAssistantId?: string }) => {
       const trimmed = text.trim();
       if (!trimmed || sendInFlightRef.current) return;
 
@@ -218,30 +237,45 @@ function HomePageContent() {
       }
 
       const userMessage = createMessage("user", trimmed);
-      const assistantId = crypto.randomUUID();
-      const nextMessages = [
-        ...messages,
-        userMessage,
-        createMessage("assistant", ""),
-      ];
+      const assistantId = options?.replaceAssistantId ?? crypto.randomUUID();
+      const assistantPlaceholder: ChatMessage = {
+        id: assistantId,
+        role: "assistant",
+        content: "",
+      };
+
+      let nextMessages: ChatMessage[];
+
+      if (options?.replaceAssistantId) {
+        const replaceIndex = messages.findIndex(
+          (message) => message.id === options.replaceAssistantId,
+        );
+        if (replaceIndex < 0) return;
+
+        nextMessages = [
+          ...messages.slice(0, replaceIndex),
+          assistantPlaceholder,
+        ];
+      } else {
+        nextMessages = [...messages, userMessage, assistantPlaceholder];
+      }
 
       setMessages(nextMessages);
       setDraft("");
       setError(null);
       setStreamingAssistantId(assistantId);
+      setIsGenerating(true);
       sendInFlightRef.current = true;
       loadedChatIdRef.current = sessionId;
 
-      const inferredContext = inferPortfolioContextFromMessages(
-        nextMessages.filter((message) => message.content.trim().length > 0),
-      );
-      if (inferredContext !== "empty") {
-        setContext(inferredContext);
-      }
+      abortControllerRef.current?.abort();
+      abortControllerRef.current = new AbortController();
 
       try {
         const result = await streamChatMessage(
-          toApiMessages(nextMessages.filter((message) => message.content)),
+          toApiMessages(
+            nextMessages.filter((message) => message.content.trim().length > 0),
+          ),
           (event) => {
             if (event.type === "delta") {
               setMessages((previous) =>
@@ -256,10 +290,6 @@ function HomePageContent() {
                     : message,
                 ),
               );
-
-              if (event.context) {
-                setContext(event.context);
-              }
             }
 
             if (event.type === "finish") {
@@ -270,10 +300,9 @@ function HomePageContent() {
                     : message,
                 ),
               );
-              setContext(event.context);
-              setStreamingAssistantId(null);
             }
           },
+          { signal: abortControllerRef.current.signal },
         );
 
         if (!result.message.trim()) {
@@ -295,6 +324,30 @@ function HomePageContent() {
         loadedChatIdRef.current = sessionId;
         router.replace(`/?chat=${sessionId}`, { scroll: false });
       } catch (requestError) {
+        if (
+          requestError instanceof DOMException &&
+          requestError.name === "AbortError"
+        ) {
+          setMessages((previous) => {
+            const current = previous.find((message) => message.id === assistantId);
+            const content = current?.content.trim() ?? "";
+            const finalized = content
+              ? previous
+              : previous.filter((message) => message.id !== assistantId);
+
+            if (content) {
+              persistSession(
+                finalized,
+                sessionId,
+                inferPortfolioContextFromMessages(finalized),
+              );
+            }
+
+            return finalized;
+          });
+          return;
+        }
+
         setMessages((previous) =>
           previous.filter((message) => message.id !== assistantId),
         );
@@ -305,7 +358,9 @@ function HomePageContent() {
         );
       } finally {
         sendInFlightRef.current = false;
+        setIsGenerating(false);
         setStreamingAssistantId(null);
+        abortControllerRef.current = null;
       }
     },
     [
@@ -316,6 +371,20 @@ function HomePageContent() {
       syncContextInUrl,
     ],
   );
+
+  function regenerateAssistantMessage(assistantId: string) {
+    const index = messages.findIndex((message) => message.id === assistantId);
+    if (index <= 0) return;
+
+    const userMessage = messages
+      .slice(0, index)
+      .reverse()
+      .find((message) => message.role === "user");
+
+    if (!userMessage) return;
+
+    sendMessage(userMessage.content, { replaceAssistantId: assistantId });
+  }
 
   function handleChatSubmit() {
     sendMessage(draft);
@@ -386,7 +455,19 @@ function HomePageContent() {
         onDeleteChatRequest={handleDeleteChatRequest}
         context={
         hasConversation ? (
-          <div className="glass-panel h-full overflow-y-auto p-4 sm:p-6">
+          <div className="glass-panel relative h-full overflow-y-auto p-4 sm:p-6">
+            {isGenerating && (
+              <div
+                className={cn(
+                  "absolute inset-0 z-10 flex items-center justify-center",
+                  "bg-[var(--surface)]/55 backdrop-blur-[2px]",
+                )}
+                aria-live="polite"
+                aria-busy="true"
+              >
+                <ThinkingIndicator />
+              </div>
+            )}
             <ContextPanel context={context as ContextType} />
           </div>
         ) : undefined
@@ -396,7 +477,7 @@ function HomePageContent() {
         <Hero onSendMessage={sendMessage} disclaimer={getDisclaimer()} />
       ) : (
         <div className="flex h-full min-h-0 flex-col">
-          <ChatWindow className="min-h-0 flex-1 px-4 py-4 sm:px-6 sm:py-6">
+          <ChatWindow endRef={endRef} className="min-h-0 flex-1 px-4 py-4 sm:px-6 sm:py-6">
             {messages
               .filter(
                 (message) =>
@@ -408,22 +489,35 @@ function HomePageContent() {
                 const isThinking =
                   message.id === streamingAssistantId &&
                   message.content.trim().length === 0;
-                const text = isThinking
-                  ? "Ayush AI is thinking…"
-                  : message.content;
+                const isStreaming =
+                  isGenerating && message.id === streamingAssistantId;
 
                 return (
                   <MessageBubble
                     key={message.id}
                     role={message.role}
+                    isThinking={isThinking}
+                    isStreaming={isStreaming && !isThinking}
                     markdown={
                       message.role === "assistant" && !isThinking
                     }
+                    onRegenerate={
+                      message.role === "assistant" && !isGenerating
+                        ? () => regenerateAssistantMessage(message.id)
+                        : undefined
+                    }
                   >
-                    {text}
+                    {message.content}
                   </MessageBubble>
                 );
               })}
+
+            {showFollowUps && (
+              <FollowUpSuggestions
+                suggestions={followUpSuggestions}
+                onSelect={(label) => sendMessage(label)}
+              />
+            )}
           </ChatWindow>
 
           <div className="shrink-0 border-t border-[var(--border)] p-4 sm:p-6">
@@ -434,7 +528,8 @@ function HomePageContent() {
             <ChatInput
               value={draft}
               placeholder="Ask me anything about my career, skills, or projects..."
-              loading={isAwaitingAssistantText}
+              streaming={isGenerating}
+              onStop={handleStopGeneration}
               onChange={(event) => setDraft(event.target.value)}
               onSubmit={handleChatSubmit}
             />

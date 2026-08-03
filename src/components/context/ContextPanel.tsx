@@ -1,3 +1,7 @@
+import type { ReactNode } from "react";
+
+import { cn } from "@/utils/cn";
+
 import { EmptyPanel } from "./EmptyPanel";
 import { AboutPanel } from "./AboutPanel";
 import { ProjectsPanel } from "./ProjectsPanel";
@@ -14,30 +18,36 @@ export interface ContextPanelProps {
   context: ContextType;
 }
 
-export function ContextPanel({
-  context,
-}: ContextPanelProps) {
+export function ContextPanel({ context }: ContextPanelProps) {
+  let panel: ReactNode;
+
   switch (context) {
     case "about":
-      return <AboutPanel />;
-
+      panel = <AboutPanel />;
+      break;
     case "projects":
-      return <ProjectsPanel />;
-
+      panel = <ProjectsPanel />;
+      break;
     case "skills":
-      return <SkillsPanel />;
-
+      panel = <SkillsPanel />;
+      break;
     case "experience":
-      return <ExperiencePanel />;
-
+      panel = <ExperiencePanel />;
+      break;
     case "resume":
-      return <ResumePanel />;
-
+      panel = <ResumePanel />;
+      break;
     case "contact":
-      return <ContactPanel />;
-
+      panel = <ContactPanel />;
+      break;
     case "empty":
     default:
-      return <EmptyPanel />;
+      panel = <EmptyPanel />;
   }
+
+  return (
+    <div key={context} className={cn("context-panel-animate min-h-0")}>
+      {panel}
+    </div>
+  );
 }

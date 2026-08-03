@@ -1,9 +1,14 @@
 import type { ChatCompletionResult, ChatMessageInput } from "@/types/chat";
 import type { ChatStreamEvent } from "@/types/chatStream";
 
+type StreamChatOptions = {
+  signal?: AbortSignal;
+};
+
 export async function streamChatMessage(
   messages: ChatMessageInput[],
   onEvent: (event: ChatStreamEvent) => void,
+  options?: StreamChatOptions,
 ): Promise<ChatCompletionResult> {
   const response = await fetch("/api/chat", {
     method: "POST",
@@ -11,6 +16,7 @@ export async function streamChatMessage(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ messages }),
+    signal: options?.signal,
   });
 
   if (!response.ok) {
@@ -30,32 +36,39 @@ export async function streamChatMessage(
   let buffer = "";
   let finalResult: ChatCompletionResult | null = null;
 
-  while (true) {
-    const { done, value } = await reader.read();
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
 
-    if (done) break;
+      if (done) break;
 
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split("\n");
-    buffer = lines.pop() ?? "";
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop() ?? "";
 
-    for (const line of lines) {
-      if (!line.trim()) continue;
+      for (const line of lines) {
+        if (!line.trim()) continue;
 
-      const event = JSON.parse(line) as ChatStreamEvent;
-      onEvent(event);
+        const event = JSON.parse(line) as ChatStreamEvent;
+        onEvent(event);
 
-      if (event.type === "finish") {
-        finalResult = {
-          message: event.message,
-          context: event.context,
-        };
-      }
+        if (event.type === "finish") {
+          finalResult = {
+            message: event.message,
+            context: event.context,
+          };
+        }
 
-      if (event.type === "error") {
-        throw new Error(event.error);
+        if (event.type === "error") {
+          throw new Error(event.error);
+        }
       }
     }
+  } catch (error) {
+    if (options?.signal?.aborted) {
+      throw new DOMException("Aborted", "AbortError");
+    }
+    throw error;
   }
 
   if (!finalResult) {

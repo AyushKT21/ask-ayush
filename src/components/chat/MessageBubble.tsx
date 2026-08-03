@@ -66,7 +66,7 @@ function MessageBubbleComponent({
           {isStreaming && !isThinking && <StreamingCursor />}
         </Card>
 
-        {isUser && (avatar ?? <Avatar fallback="AK" />)}
+        {isUser && (avatar ?? <Avatar fallback="AT" />)}
       </div>
 
       {!isUser && !isThinking && textContent && (

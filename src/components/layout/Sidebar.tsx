@@ -120,7 +120,7 @@ export function Sidebar({
               "font-bold text-lg text-white shadow-md",
             )}
           >
-            AY
+            AT
           </div>
 
           <div>

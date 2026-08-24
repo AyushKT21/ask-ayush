@@ -32,7 +32,11 @@ export function MessageActions({
   return (
     <div
       className={cn(
-        "flex items-center gap-1 pt-2 opacity-0 transition-opacity group-hover:opacity-100",
+        "flex items-center gap-1",
+        "opacity-0 transition-opacity duration-150",
+        "pointer-events-none group-hover:pointer-events-auto group-hover:opacity-100",
+        "focus-within:pointer-events-auto focus-within:opacity-100",
+        "[@media(hover:none)]:pointer-events-auto [@media(hover:none)]:opacity-100",
         className,
       )}
     >

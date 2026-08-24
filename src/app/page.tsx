@@ -507,12 +507,17 @@ function HomePageContent() {
                   message.content.trim().length > 0 ||
                   message.id === streamingAssistantId,
               )
-              .map((message) => {
+              .map((message, index, visibleMessages) => {
                 const isThinking =
                   message.id === streamingAssistantId &&
                   message.content.trim().length === 0;
                 const isStreaming =
                   isGenerating && message.id === streamingAssistantId;
+                const isLastAssistantMessage =
+                  message.role === "assistant" &&
+                  !visibleMessages
+                    .slice(index + 1)
+                    .some((item) => item.role === "assistant");
 
                 return (
                   <MessageBubble
@@ -522,6 +527,12 @@ function HomePageContent() {
                     isStreaming={isStreaming && !isThinking}
                     markdown={
                       message.role === "assistant" && !isThinking
+                    }
+                    showActions={
+                      message.role === "assistant" &&
+                      !isThinking &&
+                      !isGenerating &&
+                      isLastAssistantMessage
                     }
                     onRegenerate={
                       message.role === "assistant" && !isGenerating

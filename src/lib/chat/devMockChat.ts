@@ -5,6 +5,7 @@ import {
   RESUME,
   SKILL_CATEGORIES,
 } from "@/constants/portfolio";
+import { deriveAnswerSources } from "@/lib/chat/answerSources";
 import {
   inferPortfolioContextFromMessages,
   inferPortfolioContextFromText,
@@ -77,6 +78,7 @@ export function runDevMockChat(
   return {
     message: buildDevMessage(context, text),
     context,
+    sources: deriveAnswerSources(context),
   };
 }
 

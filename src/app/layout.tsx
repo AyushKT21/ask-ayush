@@ -22,6 +22,19 @@ export const metadata: Metadata = {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
     shortcut: "/icon.svg",
   },
+  openGraph: {
+    title: "Ayush AI",
+    description:
+      "Ask anything about my career, projects, experience and skills.",
+    type: "website",
+    siteName: "Ayush AI",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ayush AI",
+    description:
+      "Ask anything about my career, projects, experience and skills.",
+  },
 };
 
 export default function RootLayout({

@@ -46,7 +46,7 @@ export function ContextPanel({ context }: ContextPanelProps) {
   }
 
   return (
-    <div key={context} className={cn("context-panel-animate min-h-0")}>
+    <div className={cn("min-h-0")}>
       {panel}
     </div>
   );

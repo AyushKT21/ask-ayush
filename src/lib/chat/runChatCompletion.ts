@@ -2,6 +2,7 @@ import { openai } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { z } from "zod";
 
+import { deriveAnswerSources } from "@/lib/chat/answerSources";
 import { runDevMockChat } from "@/lib/chat/devMockChat";
 import { getChatSystemPrompt } from "@/lib/chat/systemPrompt";
 import { PORTFOLIO_CONTEXTS } from "@/types/context";
@@ -43,6 +44,7 @@ export async function runChatCompletion(
     return {
       message: object.message,
       context: object.context,
+      sources: deriveAnswerSources(object.context),
     };
   } catch {
     return runDevMockChat(messages);

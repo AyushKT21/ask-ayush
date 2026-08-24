@@ -1,29 +1,15 @@
 import type { LucideIcon } from "lucide-react";
-import {
-  BriefcaseBusiness,
-  FileText,
-  FolderGit2,
-  Mail,
-  MessageSquare,
-  Plus,
-  Sparkles,
-  User,
-  Wrench,
-  X,
-} from "lucide-react";
+import { MessageSquare, Plus, Sparkles, X } from "lucide-react";
 import Link from "next/link";
 
 import type { ContextType } from "@/components/context/ContextPanel";
 import { buttonVariants } from "@/components/ui/Button";
-import { PROFILE } from "@/constants/portfolio";
+import {
+  EXTERNAL_NAVIGATION,
+  PORTFOLIO_NAVIGATION,
+  type NavigationItem,
+} from "@/constants/navigation";
 import { cn } from "@/utils/cn";
-
-type NavigationItem = {
-  label: string;
-  href: string;
-  icon: LucideIcon;
-  context?: ContextType;
-};
 
 type RecentChatItem = {
   id: string;
@@ -31,58 +17,8 @@ type RecentChatItem = {
 };
 
 const navigation: NavigationItem[] = [
-  {
-    label: "Ask Ayush",
-    href: "/",
-    icon: MessageSquare,
-    context: "empty",
-  },
-  {
-    label: "About Me",
-    href: "/?context=about",
-    icon: User,
-    context: "about",
-  },
-  {
-    label: "Projects",
-    href: "/?context=projects",
-    icon: FolderGit2,
-    context: "projects",
-  },
-  {
-    label: "Experience",
-    href: "/?context=experience",
-    icon: BriefcaseBusiness,
-    context: "experience",
-  },
-  {
-    label: "Skills",
-    href: "/?context=skills",
-    icon: Wrench,
-    context: "skills",
-  },
-  {
-    label: "Resume",
-    href: "/?context=resume",
-    icon: FileText,
-    context: "resume",
-  },
-  {
-    label: "Ayush.dev",
-    href: PROFILE.classicPortfolioHref,
-    icon: FolderGit2,
-  },
-  {
-    label: "GitHub",
-    href: "https://github.com/AyushKT21",
-    icon: FolderGit2,
-  },
-  {
-    label: "Contact",
-    href: "/?context=contact",
-    icon: Mail,
-    context: "contact",
-  },
+  ...PORTFOLIO_NAVIGATION,
+  ...EXTERNAL_NAVIGATION,
 ];
 
 type SidebarProps = {
@@ -214,7 +150,7 @@ export function Sidebar({
       >
         {navigation.map((item) => {
           const Icon = item.icon;
-          const isExternal = item.href.startsWith("http");
+          const isExternal = item.external ?? item.href.startsWith("http");
           const isActive =
             !isExternal &&
             (item.context ?? "empty") === activeContext &&
@@ -231,7 +167,7 @@ export function Sidebar({
           if (isExternal) {
             return (
               <a
-                key={item.label}
+                key={item.id}
                 href={item.href}
                 target="_blank"
                 rel="noreferrer"
@@ -245,7 +181,7 @@ export function Sidebar({
 
           return (
             <Link
-              key={item.label}
+              key={item.id}
               href={item.href}
               onClick={onNavigate}
               className={linkClassName}

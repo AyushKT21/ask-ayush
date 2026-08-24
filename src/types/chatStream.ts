@@ -10,6 +10,7 @@ export type ChatStreamEvent =
       type: "finish";
       message: string;
       context: PortfolioContext;
+      sources: string[];
     }
   | {
       type: "error";

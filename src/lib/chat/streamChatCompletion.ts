@@ -1,6 +1,7 @@
 import { openai } from "@ai-sdk/openai";
 import { stepCountIs, streamText } from "ai";
 
+import { deriveAnswerSources } from "@/lib/chat/answerSources";
 import { runDevMockChat } from "@/lib/chat/devMockChat";
 import { portfolioTools } from "@/lib/chat/portfolioTools";
 import { getChatSystemPrompt } from "@/lib/chat/systemPrompt";
@@ -41,6 +42,7 @@ async function streamMockCompletion(
       type: "finish",
       message: result.message,
       context: result.context,
+      sources: result.sources,
     }),
   );
 }
@@ -51,6 +53,7 @@ async function streamOpenAiCompletion(
 ) {
   let message = "";
   let lastContext: PortfolioContext | undefined;
+  const toolsUsed = new Set<string>();
 
   const result = streamText({
     model: openai("gpt-4o-mini"),
@@ -75,17 +78,21 @@ async function streamOpenAiCompletion(
       );
     }
 
-    if (part.type === "tool-result" && part.toolName === "setContextPanel") {
-      const output = part.output as { context?: PortfolioContext };
-      if (output?.context) {
-        lastContext = output.context;
-        controller.enqueue(
-          encodeEvent({
-            type: "delta",
-            message,
-            context: lastContext,
-          }),
-        );
+    if (part.type === "tool-result") {
+      toolsUsed.add(part.toolName);
+
+      if (part.toolName === "setContextPanel") {
+        const output = part.output as { context?: PortfolioContext };
+        if (output?.context) {
+          lastContext = output.context;
+          controller.enqueue(
+            encodeEvent({
+              type: "delta",
+              message,
+              context: lastContext,
+            }),
+          );
+        }
       }
     }
   }
@@ -118,11 +125,14 @@ async function streamOpenAiCompletion(
     }),
   );
 
+  const sources = deriveAnswerSources(lastContext, [...toolsUsed]);
+
   controller.enqueue(
     encodeEvent({
       type: "finish",
       message: finalMessage,
       context: lastContext,
+      sources,
     }),
   );
 }

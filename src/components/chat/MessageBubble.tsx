@@ -18,6 +18,7 @@ export interface MessageBubbleProps
   isThinking?: boolean;
   onRegenerate?: () => void;
   sources?: string[];
+  showActions?: boolean;
 }
 
 function MessageBubbleComponent({
@@ -29,6 +30,7 @@ function MessageBubbleComponent({
   isThinking = false,
   onRegenerate,
   sources,
+  showActions = false,
   children,
   ...props
 }: MessageBubbleProps) {
@@ -45,7 +47,7 @@ function MessageBubbleComponent({
 
   return (
     <div
-      className={cn("group flex w-full flex-col gap-1", className)}
+      className={cn("group relative flex w-full flex-col", className)}
       {...props}
     >
       <div
@@ -75,13 +77,12 @@ function MessageBubbleComponent({
         {isUser && (avatar ?? <Avatar fallback="AT" />)}
       </div>
 
-      {!isUser && !isThinking && textContent && (
-        <div className="pl-11">
-          <MessageActions
-            content={textContent}
-            onRegenerate={onRegenerate}
-          />
-        </div>
+      {!isUser && !isThinking && textContent && showActions && (
+        <MessageActions
+          content={textContent}
+          onRegenerate={onRegenerate}
+          className="absolute left-11 top-full mt-1"
+        />
       )}
     </div>
   );

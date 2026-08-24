@@ -3,6 +3,7 @@ import { generateObject } from "ai";
 import { z } from "zod";
 
 import { deriveAnswerSources } from "@/lib/chat/answerSources";
+import { getFallbackFollowUpSuggestions } from "@/lib/chat/followUpSuggestions";
 import { runDevMockChat } from "@/lib/chat/devMockChat";
 import { getChatSystemPrompt } from "@/lib/chat/systemPrompt";
 import { PORTFOLIO_CONTEXTS } from "@/types/context";
@@ -45,6 +46,7 @@ export async function runChatCompletion(
       message: object.message,
       context: object.context,
       sources: deriveAnswerSources(object.context),
+      followUps: getFallbackFollowUpSuggestions(object.context),
     };
   } catch {
     return runDevMockChat(messages);

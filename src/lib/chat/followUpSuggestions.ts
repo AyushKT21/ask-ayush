@@ -38,9 +38,17 @@ const BY_CONTEXT: Record<PortfolioContext, string[]> = {
   ],
 };
 
-export function getFollowUpSuggestions(
+export function getFallbackFollowUpSuggestions(
   context: PortfolioContext,
   limit = 3,
 ): string[] {
   return BY_CONTEXT[context].slice(0, limit);
+}
+
+/** @deprecated Use generateFollowUpSuggestions on the server or message.followUps */
+export function getFollowUpSuggestions(
+  context: PortfolioContext,
+  limit = 3,
+): string[] {
+  return getFallbackFollowUpSuggestions(context, limit);
 }

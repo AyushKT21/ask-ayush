@@ -11,6 +11,7 @@ export type ChatStreamEvent =
       message: string;
       context: PortfolioContext;
       sources: string[];
+      followUps: string[];
     }
   | {
       type: "error";

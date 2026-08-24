@@ -57,6 +57,7 @@ export async function streamChatMessage(
             message: event.message,
             context: event.context,
             sources: event.sources,
+            followUps: event.followUps,
           };
         }
 

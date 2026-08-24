@@ -28,7 +28,7 @@ import {
   type RecentChatSession,
 } from "@/lib/chat/recentChats";
 import { inferPortfolioContextFromMessages } from "@/lib/chat/inferPortfolioContext";
-import { getFollowUpSuggestions } from "@/lib/chat/followUpSuggestions";
+import { getFallbackFollowUpSuggestions } from "@/lib/chat/followUpSuggestions";
 import { streamChatMessage } from "@/services/chat/streamChatMessage";
 import { useChatScroll } from "@/hooks/useChatScroll";
 import { PORTFOLIO_CONTEXTS, type PortfolioContext } from "@/types/context";
@@ -182,7 +182,9 @@ function HomePageContent() {
     lastAssistantMessage &&
     lastAssistantMessage.content.trim().length > 0;
 
-  const followUpSuggestions = getFollowUpSuggestions(context);
+  const followUpSuggestions =
+    lastAssistantMessage?.followUps ??
+    getFallbackFollowUpSuggestions(context);
 
   const syncContextInUrl = React.useCallback(
     (nextContext: PortfolioContext) => {
@@ -303,6 +305,7 @@ function HomePageContent() {
                         ...message,
                         content: event.message,
                         sources: event.sources,
+                        followUps: event.followUps,
                       }
                     : message,
                 ),
@@ -323,6 +326,7 @@ function HomePageContent() {
                   ...message,
                   content: result.message,
                   sources: result.sources,
+                  followUps: result.followUps,
                 }
               : message,
           );

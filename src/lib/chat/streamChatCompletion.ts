@@ -2,6 +2,7 @@ import { openai } from "@ai-sdk/openai";
 import { stepCountIs, streamText } from "ai";
 
 import { deriveAnswerSources } from "@/lib/chat/answerSources";
+import { generateFollowUpSuggestions } from "@/lib/chat/generateFollowUpSuggestions";
 import { runDevMockChat } from "@/lib/chat/devMockChat";
 import { portfolioTools } from "@/lib/chat/portfolioTools";
 import { getChatSystemPrompt } from "@/lib/chat/systemPrompt";
@@ -37,12 +38,20 @@ async function streamMockCompletion(
     await sleep(18);
   }
 
+  const followUps = await generateFollowUpSuggestions({
+    messages,
+    assistantMessage: result.message,
+    context: result.context,
+    hasApiKey: false,
+  });
+
   controller.enqueue(
     encodeEvent({
       type: "finish",
       message: result.message,
       context: result.context,
       sources: result.sources,
+      followUps,
     }),
   );
 }
@@ -126,6 +135,12 @@ async function streamOpenAiCompletion(
   );
 
   const sources = deriveAnswerSources(lastContext, [...toolsUsed]);
+  const followUps = await generateFollowUpSuggestions({
+    messages,
+    assistantMessage: finalMessage,
+    context: lastContext,
+    hasApiKey: true,
+  });
 
   controller.enqueue(
     encodeEvent({
@@ -133,17 +148,19 @@ async function streamOpenAiCompletion(
       message: finalMessage,
       context: lastContext,
       sources,
+      followUps,
     }),
   );
 }
 
 export function createChatCompletionStream(messages: ChatMessageInput[]) {
   const apiKey = process.env.OPENAI_API_KEY?.trim();
+  const hasApiKey = Boolean(apiKey);
 
   return new ReadableStream<Uint8Array>({
     async start(controller) {
       try {
-        if (!apiKey) {
+        if (!hasApiKey) {
           await streamMockCompletion(messages, controller);
         } else {
           await streamOpenAiCompletion(messages, controller);

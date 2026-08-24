@@ -7,6 +7,7 @@ export type ChatMessage = {
   role: ChatRole;
   content: string;
   sources?: string[];
+  followUps?: string[];
 };
 
 export type ChatMessageInput = {
@@ -18,4 +19,5 @@ export type ChatCompletionResult = {
   message: string;
   context: PortfolioContext;
   sources: string[];
+  followUps: string[];
 };

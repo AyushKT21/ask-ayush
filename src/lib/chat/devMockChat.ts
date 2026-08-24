@@ -6,6 +6,7 @@ import {
   SKILL_CATEGORIES,
 } from "@/constants/portfolio";
 import { deriveAnswerSources } from "@/lib/chat/answerSources";
+import { getFallbackFollowUpSuggestions } from "@/lib/chat/followUpSuggestions";
 import {
   inferPortfolioContextFromMessages,
   inferPortfolioContextFromText,
@@ -79,6 +80,7 @@ export function runDevMockChat(
     message: buildDevMessage(context, text),
     context,
     sources: deriveAnswerSources(context),
+    followUps: getFallbackFollowUpSuggestions(context),
   };
 }
 

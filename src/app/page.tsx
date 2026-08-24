@@ -5,12 +5,13 @@ import { Suspense } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { AppLayout } from "@/components/layout/AppLayout";
+import { CommandPalette } from "@/components/layout/CommandPalette";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { ChatWindow } from "@/components/chat/ChatWindow";
 import { FollowUpSuggestions } from "@/components/chat/FollowUpSuggestions";
 import { MessageBubble } from "@/components/chat/MessageBubble";
+import { AnimatedContextPanel } from "@/components/context/AnimatedContextPanel";
 import {
-  ContextPanel,
   type ContextType,
 } from "@/components/context/ContextPanel";
 import { Hero } from "@/components/portfolio/Hero";
@@ -84,6 +85,7 @@ function HomePageContent() {
   const [pendingDeleteChatId, setPendingDeleteChatId] = React.useState<
     string | null
   >(null);
+  const [commandPaletteOpen, setCommandPaletteOpen] = React.useState(false);
   const loadedChatIdRef = React.useRef<string | null>(null);
   const sendInFlightRef = React.useRef(false);
   const abortControllerRef = React.useRef<AbortController | null>(null);
@@ -96,13 +98,13 @@ function HomePageContent() {
     function onKeyDown(event: KeyboardEvent) {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
-        router.push("/?new=1");
+        setCommandPaletteOpen(true);
       }
     }
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [router]);
+  }, []);
 
   React.useEffect(() => {
     fetch("/api/chat/status")
@@ -297,7 +299,11 @@ function HomePageContent() {
               setMessages((previous) =>
                 previous.map((message) =>
                   message.id === assistantId
-                    ? { ...message, content: event.message }
+                    ? {
+                        ...message,
+                        content: event.message,
+                        sources: event.sources,
+                      }
                     : message,
                 ),
               );
@@ -313,7 +319,11 @@ function HomePageContent() {
         setMessages((previous) => {
           const finalized = previous.map((message) =>
             message.id === assistantId
-              ? { ...message, content: result.message }
+              ? {
+                  ...message,
+                  content: result.message,
+                  sources: result.sources,
+                }
               : message,
           );
           persistSession(finalized, sessionId, result.context);
@@ -435,6 +445,11 @@ function HomePageContent() {
 
   return (
     <>
+      <CommandPalette
+        open={commandPaletteOpen}
+        onClose={() => setCommandPaletteOpen(false)}
+      />
+
       <ConfirmDialog
         open={pendingDeleteChatId !== null}
         title="Delete this chat?"
@@ -471,7 +486,7 @@ function HomePageContent() {
                 <ThinkingIndicator />
               </div>
             )}
-            <ContextPanel context={context as ContextType} />
+            <AnimatedContextPanel context={context as ContextType} />
           </div>
         ) : undefined
       }
@@ -509,6 +524,7 @@ function HomePageContent() {
                         ? () => regenerateAssistantMessage(message.id)
                         : undefined
                     }
+                    sources={message.sources}
                   >
                     {message.content}
                   </MessageBubble>

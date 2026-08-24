@@ -6,6 +6,7 @@ export type ChatMessage = {
   id: string;
   role: ChatRole;
   content: string;
+  sources?: string[];
 };
 
 export type ChatMessageInput = {
@@ -16,4 +17,5 @@ export type ChatMessageInput = {
 export type ChatCompletionResult = {
   message: string;
   context: PortfolioContext;
+  sources: string[];
 };

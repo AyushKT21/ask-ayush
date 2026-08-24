@@ -4,6 +4,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Card } from "@/components/ui/Card";
 import { MessageMarkdown } from "@/components/markdown/MessageMarkdown";
 import { MessageActions } from "@/components/chat/MessageActions";
+import { MessageSources } from "@/components/chat/MessageSources";
 import { StreamingCursor } from "@/components/chat/StreamingCursor";
 import { ThinkingIndicator } from "@/components/chat/ThinkingIndicator";
 import { cn } from "@/utils/cn";
@@ -16,6 +17,7 @@ export interface MessageBubbleProps
   isStreaming?: boolean;
   isThinking?: boolean;
   onRegenerate?: () => void;
+  sources?: string[];
 }
 
 function MessageBubbleComponent({
@@ -26,6 +28,7 @@ function MessageBubbleComponent({
   isStreaming = false,
   isThinking = false,
   onRegenerate,
+  sources,
   children,
   ...props
 }: MessageBubbleProps) {
@@ -63,6 +66,9 @@ function MessageBubbleComponent({
           )}
         >
           {body}
+          {!isUser && !isThinking && sources && sources.length > 0 && (
+            <MessageSources sources={sources} />
+          )}
           {isStreaming && !isThinking && <StreamingCursor />}
         </Card>
 

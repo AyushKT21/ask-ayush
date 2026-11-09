@@ -72,7 +72,7 @@ export const PROJECTS: Project[] = [
     featured: true,
     href: "https://ask-ayush.vercel.app/",
     github: "https://github.com/AyushKT21/ask-ayush",
-    thumbnailSrc: "/projects/ayush-ai.svg",
+    thumbnailSrc: "/projects/ask-ayush.png",
   },
   {
     id: "edge-folio",
@@ -83,7 +83,18 @@ export const PROJECTS: Project[] = [
     featured: true,
     href: "https://edge-folio.vercel.app/",
     github: "https://github.com/AyushKT21",
-    thumbnailSrc: "/projects/edge-folio.svg",
+    thumbnailSrc: "/projects/edge-folio.png",
+  },
+  {
+    id: "currency-flow",
+    title: "CurrencyFlow",
+    description:
+      "Responsive currency converter covering 150+ currencies, with historical rates, a 30-day trend chart, and conversion history saved locally.",
+    tags: ["React", "TypeScript", "REST APIs", "Recharts"],
+    featured: true,
+    href: "https://currencyflow-navy.vercel.app/",
+    github: "http://github.com/AyushKT21/CurrencyFlow",
+    thumbnailSrc: "/projects/Currency-flow.png",
   },
   {
     id: "design-to-code-ui",
@@ -204,6 +215,4 @@ export const RESUME = {
     "Frontend developer focused on React, TypeScript, UI systems, and AI-powered product experiences.",
 } as const;
 
-export const FEATURED_PROJECTS = PROJECTS.filter(
-  (project) => project.featured,
-);
+export const FEATURED_PROJECTS = PROJECTS.filter((project) => project.featured);
